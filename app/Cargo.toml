@@ -1,5 +1,5 @@
 [package]
-name = "app"
+name = "neige"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,5 @@ edition = "2021"
 neige-macros = { path = "../macros", package = "macros" }
 
 tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "sync"] }
+hyper = { version = "1.1", features = ["http1", "http2", "client"] }
+hyper-tls = "0.6"
