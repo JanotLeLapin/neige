@@ -1,0 +1,9 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+neige-macros = { path = "../macros", package = "macros" }
+
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "sync"] }
