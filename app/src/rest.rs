@@ -1,4 +1,7 @@
 use tokio::sync::{mpsc, oneshot};
+use hyper_util::client::legacy::Client;
+use hyper_util::rt::TokioExecutor;
+use http_body_util::{Empty, BodyExt};
 
 pub struct RestRequest<'a> {
     res: oneshot::Sender<String>,
@@ -12,9 +15,23 @@ pub async fn send<'a>(tx: &mut mpsc::Sender<RestRequest<'a>>, url: &'a str, body
     res_rx.await
 }
 
-pub async fn rest_task(rx: &mut mpsc::Receiver<RestRequest<'_>>) {
+pub async fn rest_task(token: &str, rx: &mut mpsc::Receiver<RestRequest<'_>>) {
     while let Some(data) = rx.recv().await {
-        println!("Got request for '{}'", data.url);
-        data.res.send("foobar".to_string()).unwrap();
+        let https = hyper_tls::HttpsConnector::new();
+        let client = Client::builder(TokioExecutor::new())
+            .build::<_, Empty<bytes::Bytes>>(https);
+        let req = hyper::Request::builder()
+            .uri(format!("https://discord.com/api/v10{}", data.url))
+            .header(hyper::header::AUTHORIZATION, token)
+            .body(Empty::<bytes::Bytes>::new()).unwrap();
+        let mut res = client.request(req).await.unwrap();
+        let mut buf = Vec::new();
+        while let Some(next) = res.frame().await {
+            let frame = next.unwrap();
+            if let Some(chunk) = frame.data_ref() {
+                buf.append(&mut chunk.to_vec());
+            }
+        }
+        data.res.send(String::from_utf8(buf).unwrap()).unwrap();
     }
 }

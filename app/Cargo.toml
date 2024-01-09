@@ -6,6 +6,9 @@ edition = "2021"
 [dependencies]
 neige-macros = { path = "../macros", package = "macros" }
 
-tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "sync"] }
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "net", "sync"] }
 hyper = { version = "1.1", features = ["http1", "http2", "client"] }
+hyper-util = { version = "0.1", features = ["http1", "http2", "client", "tokio"] }
 hyper-tls = "0.6"
+http-body-util = "0.1"
+bytes = "1.5"
