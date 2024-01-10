@@ -12,3 +12,6 @@ hyper-util = { version = "0.1", features = ["http1", "http2", "client", "tokio"]
 hyper-tls = "0.6"
 http-body-util = "0.1"
 bytes = "1.5"
+
+keyring = "2.3.1"
+whoami = "1.4"
